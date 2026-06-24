@@ -68,12 +68,12 @@ up: ## Start all services
 
 iag5: _ensure-gateway5-image ## Deploy IAG5 (Automation Gateway 5) standalone, no Platform
 	@./scripts/generate-certificates.sh --quiet
-	@$(IAG5_ENV) GATEWAY5_CONNECT_HOSTS= docker compose --profile gateway5 up -d
+	@$(IAG5_ENV) docker compose --profile gateway5 up -d
 	@$(MAKE) --no-print-directory status
 
 iag5-openbao: _ensure-gateway5-image ## Deploy IAG5 + OpenBao side by side (no wiring)
 	@./scripts/generate-certificates.sh --quiet
-	@$(IAG5_ENV) GATEWAY5_CONNECT_HOSTS= docker compose --profile gateway5 --profile openbao up -d
+	@$(IAG5_ENV) docker compose --profile gateway5 --profile openbao up -d
 	@./scripts/configure-openbao.sh --init-only
 	@$(MAKE) --no-print-directory status
 
@@ -91,7 +91,7 @@ _ensure-gateway5-image:
 	}
 
 down: ## Stop all services
-	@docker compose $(PROFILES) down
+	@docker compose --profile full --profile ldap --profile mcp --profile openbao down
 
 logs: ## Follow logs (all services, or: make logs LOG=platform)
 	@docker compose logs -f $(LOG)

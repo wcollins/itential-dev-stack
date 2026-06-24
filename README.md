@@ -329,11 +329,7 @@ cloud) instead, set `GATEWAY5_CONNECT_HOSTS` in your `.env`.
 wire IAG5 to consume OpenBao secrets — the two simply run together. Get the OpenBao root
 token from `volumes/openbao/init-keys.json`.
 
-Tear down with `make down` (covers IAG5 via the `full` profile). To also stop OpenBao:
-
-```bash
-docker compose --profile openbao down
-```
+Tear down with `make down`, which stops IAG5 and OpenBao together.
 
 > **Note**: An empty `GATEWAY5_CONNECT_HOSTS` is invalid for IAG5 and causes a startup
 > panic, so the compose default always resolves to a non-empty host (`platform:8080`).

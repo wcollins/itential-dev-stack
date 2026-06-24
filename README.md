@@ -316,10 +316,14 @@ make iag5            # IAG5 only
 make iag5-openbao    # IAG5 + OpenBao (side by side, initialized and unsealed)
 ```
 
-Both targets generate certificates first and skip the Gateway Manager connection, so
-IAG5 runs without a Platform to register with. They require only the IAG5 image (no
-encryption key or `.env`); if the image is missing, the target attempts a pull and
-points you to `make login` for AWS ECR access.
+Both targets generate certificates first and bring up IAG5 without a Platform. They
+require only the IAG5 image (no encryption key or `.env`); if the image is missing, the
+target attempts a pull and points you to `make login` for AWS ECR access.
+
+With no Platform running, IAG5 logs recurring Gateway Manager connection retries against
+the default `platform:8080` host. This is expected and harmless: the container stays up
+and the gRPC server listens on `50051`. To point IAG5 at a real Platform (local or
+cloud) instead, set `GATEWAY5_CONNECT_HOSTS` in your `.env`.
 
 `make iag5-openbao` brings up OpenBao alongside IAG5 and initializes it, but does not
 wire IAG5 to consume OpenBao secrets — the two simply run together. Get the OpenBao root
@@ -331,9 +335,9 @@ Tear down with `make down` (covers IAG5 via the `full` profile). To also stop Op
 docker compose --profile openbao down
 ```
 
-> **Note**: Suppressing the Gateway Manager connection relies on passing an empty
-> `GATEWAY5_CONNECT_HOSTS`. Confirm against your IAG5 version if you see registration
-> attempts in `docker logs gateway5`.
+> **Note**: An empty `GATEWAY5_CONNECT_HOSTS` is invalid for IAG5 and causes a startup
+> panic, so the compose default always resolves to a non-empty host (`platform:8080`).
+> Override it via `.env` to target a different Gateway Manager.
 
 ## 🔧 Installing Adapters
 
